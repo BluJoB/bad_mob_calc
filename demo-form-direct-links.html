@@ -547,17 +547,17 @@
                         card.innerHTML = `
                             <h4>${product}</h4>
                             <p>${demo.description}</p>
-                            <a href="${demo.url}" target="_blank" class="btn-demo" style="background-color: ${demo.color}">
+                            <button class="btn-demo" style="background-color: ${demo.color}" onclick="launchProtectedDemo('${product}')">
                                 Launch ${demo.title}
-                            </a>
+                            </button>
                         `;
                     } else {
                         card.innerHTML = `
                             <h4>${product}</h4>
                             <p>${demo.description}</p>
-                            <div class="btn-demo" style="background-color: #6c757d; cursor: not-allowed;">
+                            <button class="btn-demo" style="background-color: #6c757d; cursor: not-allowed;" disabled>
                                 Coming Soon
-                            </div>
+                            </button>
                         `;
                     }
                     
@@ -568,6 +568,22 @@
             demoLinksSection.style.display = 'block';
         }
 
+        // Secure demo launch function
+        window.launchProtectedDemo = function(product) {
+            const encodedUrls = {
+                'TIA Works': 'aHR0cHM6Ly9iYWQtbW9iLWNhbGMub25yZW5kZXIuY29tL2luZGV4Lmh0bWw='
+            };
+            
+            if (encodedUrls[product]) {
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.location = atob(encodedUrls[product]);
+                } else {
+                    alert('Please allow pop-ups to access the demo.');
+                }
+            }
+        };
+
         // Phone number formatting
         phone.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -577,6 +593,21 @@
                 value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
             }
             e.target.value = value;
+        });
+        
+        // Security measures
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'a')) {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            }
         });
     </script>
 </body>

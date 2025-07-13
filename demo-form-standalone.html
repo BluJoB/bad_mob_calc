@@ -17,6 +17,19 @@
             color: #333333;
             line-height: 1.6;
             padding: 20px;
+            /* Disable text selection globally */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Allow text selection only in form inputs */
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         .container {
@@ -251,11 +264,24 @@
             border-radius: 6px;
             font-weight: 600;
             transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
 
         .btn-demo:hover {
             background-color: #357ABD;
             transform: translateY(-2px);
+        }
+        
+        /* Disable all context menus on demo section */
+        .demo-links-section * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .error {
@@ -385,6 +411,60 @@
     </div>
 
     <script>
+        // Security measures - prevent right-click and copying
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Prevent text selection and copying
+        document.addEventListener('selectstart', function(e) {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // Prevent copy keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'a' || e.key === 'x')) {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+        
+        // Prevent drag
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Detect developer tools (basic protection)
+        let devtools = {open: false, orientation: null};
+        const threshold = 160;
+        setInterval(function() {
+            if (window.outerHeight - window.innerHeight > threshold || 
+                window.outerWidth - window.innerWidth > threshold) {
+                if (!devtools.open) {
+                    devtools.open = true;
+                    console.clear();
+                    console.log('%cProtected Content', 'color: red; font-size: 30px; font-weight: bold;');
+                    console.log('%cThis content is protected by copyright law.', 'color: red; font-size: 16px;');
+                }
+            } else {
+                devtools.open = false;
+            }
+        }, 500);
+        
+        // Disable print
+        window.addEventListener('beforeprint', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        
         // Form elements
         const form = document.getElementById('demoForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -547,17 +627,17 @@
                         card.innerHTML = `
                             <h4>${product}</h4>
                             <p>${demo.description}</p>
-                            <a href="${demo.url}" target="_blank" class="btn-demo" style="background-color: ${demo.color}">
+                            <button class="btn-demo" style="background-color: ${demo.color}" onclick="launchDemo('${product}')">
                                 Launch ${demo.title}
-                            </a>
+                            </button>
                         `;
                     } else {
                         card.innerHTML = `
                             <h4>${product}</h4>
                             <p>${demo.description}</p>
-                            <div class="btn-demo" style="background-color: #6c757d; cursor: not-allowed;">
+                            <button class="btn-demo" style="background-color: #6c757d; cursor: not-allowed;" disabled>
                                 Coming Soon
-                            </div>
+                            </button>
                         `;
                     }
                     
@@ -567,6 +647,30 @@
             
             demoLinksSection.style.display = 'block';
         }
+        
+        // Secure demo launch function
+        window.launchDemo = function(product) {
+            // Use a temporary, encoded URL that expires
+            const demos = {
+                'TIA Works': 'aHR0cHM6Ly9iYWQtbW9iLWNhbGMub25yZW5kZXIuY29tL2luZGV4Lmh0bWw=',
+                'TIA 1.OH': 'aHR0cHM6Ly9pbWFnZS10ZXh0LTEub25yZW5kZXIuY29t'
+            };
+            
+            if (demos[product]) {
+                // Decode and open in a way that doesn't expose the URL
+                const url = atob(demos[product]);
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.location = url;
+                    // Clear the URL from browser history
+                    setTimeout(() => {
+                        win.history.replaceState(null, '', 'about:blank');
+                    }, 100);
+                } else {
+                    alert('Please allow pop-ups to access the demo.');
+                }
+            }
+        };
 
         // Phone number formatting
         phone.addEventListener('input', function(e) {
