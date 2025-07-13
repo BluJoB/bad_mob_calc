@@ -141,6 +141,80 @@ app.get('/api/getDemoUsers', async (req, res) => {
     }
 });
 
+// Submit demo form data
+app.post('/api/submitDemo', async (req, res) => {
+    try {
+        // Validate required fields
+        const { firstName, lastName, email, termsAccepted, contactConsent } = req.body;
+        
+        if (!firstName || !lastName || !email) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required fields: firstName, lastName, and email are required'
+            });
+        }
+
+        if (!termsAccepted || !contactConsent) {
+            return res.status(400).json({
+                success: false,
+                error: 'Both terms acceptance and contact consent must be agreed to'
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid email format'
+            });
+        }
+
+        // Save to demo_users collection
+        const demoUser = new DemoUser({
+            firstName: req.body.firstName.trim(),
+            lastName: req.body.lastName.trim(),
+            email: req.body.email.trim().toLowerCase(),
+            company: req.body.company || null,
+            phone: req.body.phone || null,
+            products: req.body.products || [],
+            termsAccepted: req.body.termsAccepted,
+            contactConsent: req.body.contactConsent,
+            timestamp: new Date(),
+            source: req.body.source || 'demo_form',
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent')
+        });
+
+        await demoUser.save();
+
+        console.log(`✅ New demo user registered: ${email}`);
+
+        res.status(201).json({
+            success: true,
+            message: 'Demo request submitted successfully',
+            userId: demoUser._id
+        });
+
+    } catch (error) {
+        console.error('Error in /api/submitDemo:', error);
+        
+        // Check for duplicate email
+        if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+            return res.status(409).json({
+                success: false,
+                error: 'This email is already registered for demo access'
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            error: 'Failed to submit demo request. Please try again.',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
 // Get demo users with pagination
 app.get('/api/demo-users/paginated', async (req, res) => {
     try {
@@ -191,13 +265,19 @@ app.get('*', (req, res) => {
 // Start server
 const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Admin panel: http://localhost:${PORT}/admin.html`);
-    console.log(`🔍 API endpoints:`);
-    console.log(`   - POST /api/leads`);
-    console.log(`   - GET  /api/leads`);
-    console.log(`   - GET  /api/getDemoUsers`);
-    console.log(`   - GET  /api/demo-users`);
-    console.log(`   - GET  /api/health`);
+    console.log(`\n📊 Admin Panels:`);
+    console.log(`   - Calculator Leads: http://localhost:${PORT}/admin.html`);
+    console.log(`   - Demo Users: http://localhost:${PORT}/demo-admin.html`);
+    console.log(`\n📝 Forms:`);
+    console.log(`   - Demo Access Form: http://localhost:${PORT}/demo-form.html`);
+    console.log(`   - Calculator: http://localhost:${PORT}/`);
+    console.log(`\n🔍 API Endpoints:`);
+    console.log(`   - POST /api/leads          (Calculator leads)`);
+    console.log(`   - GET  /api/leads          (View calculator leads)`);
+    console.log(`   - POST /api/submitDemo     (Demo form submissions)`);
+    console.log(`   - GET  /api/getDemoUsers   (View demo users)`);
+    console.log(`   - GET  /api/demo-users     (Alternative route)`);
+    console.log(`   - GET  /api/health         (Health check)`);
 });
 
 // Export for testing
