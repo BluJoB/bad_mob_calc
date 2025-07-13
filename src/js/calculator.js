@@ -133,40 +133,6 @@ class BadMobilizationCalculator {
 
 // Form handling and UI updates
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('calculatorForm');
-    const resultsSection = document.getElementById('results');
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Gather inputs
-        const inputs = {
-            crewSize: parseInt(document.getElementById('crewSize').value),
-            hourlyRate: parseFloat(document.getElementById('hourlyRate').value),
-            mobilizationDistance: parseFloat(document.getElementById('mobilizationDistance').value),
-            projectComplexity: document.getElementById('projectComplexity').value,
-            idleHours: parseFloat(document.getElementById('idleHours').value),
-            equipmentDailyRate: parseFloat(document.getElementById('equipmentDailyRate').value),
-            numberOfVehicles: parseInt(document.getElementById('numberOfVehicles').value),
-            remobilizationRequired: document.getElementById('remobilizationRequired').value,
-            annualRevenue: parseFloat(document.getElementById('annualRevenue').value),
-            customerLifetimeValue: parseFloat(document.getElementById('customerLifetimeValue').value),
-            incidentsPerMonth: parseFloat(document.getElementById('incidentsPerMonth').value),
-            overheadRate: parseFloat(document.getElementById('overheadRate').value)
-        };
-        
-        // Calculate results
-        const calculator = new BadMobilizationCalculator(inputs);
-        const results = calculator.calculate();
-        
-        // Update UI
-        updateResults(results);
-        
-        // Show results section
-        resultsSection.style.display = 'block';
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
-    });
-    
     // Export functionality
     document.getElementById('exportResults').addEventListener('click', exportResults);
     document.getElementById('shareResults').addEventListener('click', shareResults);

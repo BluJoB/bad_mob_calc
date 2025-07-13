@@ -273,6 +273,56 @@
         </div>
     </footer>
 
+    <!-- Email Gate Modal -->
+    <div id="emailGate" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Get Your Mobilization Cost Analysis</h2>
+            <p>Join 500+ construction professionals optimizing their operations</p>
+            
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="userEmail">Email Address</label>
+                    <input type="email" id="userEmail" name="email" required placeholder="your@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="companySize">Company Size</label>
+                    <select id="companySize" name="companySize" required>
+                        <option value="">Select...</option>
+                        <option value="1-10">1-10 employees</option>
+                        <option value="11-50">11-50 employees</option>
+                        <option value="51-100">51-100 employees</option>
+                        <option value="100+">100+ employees</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="painPoint">Biggest Mobilization Challenge</label>
+                    <select id="painPoint" name="painPoint" required>
+                        <option value="">Select...</option>
+                        <option value="communication">Poor communication/coordination</option>
+                        <option value="planning">Inadequate planning</option>
+                        <option value="resources">Resource availability</option>
+                        <option value="weather">Weather/external factors</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="newsletter" name="newsletter" checked>
+                        Send me construction efficiency tips (1-2 emails/month)
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-full">Calculate My Costs</button>
+                
+                <p class="privacy-note">We respect your privacy. Unsubscribe anytime.</p>
+            </form>
+        </div>
+    </div>
+
     <script src="src/js/calculator.js"></script>
+    <script src="src/js/email-gate.js"></script>
 </body>
 </html>
