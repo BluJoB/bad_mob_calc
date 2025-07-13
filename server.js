@@ -411,12 +411,28 @@ app.get('/api/demo-users/paginated', async (req, res) => {
     }
 });
 
-// Health check endpoint
+// Health check endpoint with detailed info
 app.get('/api/health', (req, res) => {
+    const mongoStatus = {
+        0: 'disconnected',
+        1: 'connected',
+        2: 'connecting',
+        3: 'disconnecting'
+    };
+    
     res.json({
         success: true,
         status: 'healthy',
-        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        mongodb: {
+            status: mongoStatus[mongoose.connection.readyState] || 'unknown',
+            readyState: mongoose.connection.readyState,
+            host: mongoose.connection.host || 'not connected',
+            name: mongoose.connection.name || 'not connected'
+        },
+        environment: {
+            hasMongoUri: !!process.env.MONGODB_URI,
+            nodeEnv: process.env.NODE_ENV || 'production'
+        },
         timestamp: new Date().toISOString()
     });
 });
