@@ -25,35 +25,38 @@ function storeUserData(email, companySize, painPoint, newsletter) {
 
 // Send data to backend (implement based on your setup)
 function sendToBackend(userData) {
-    // Option 1: Send to Zapier webhook
-    // fetch('https://hooks.zapier.com/hooks/catch/YOUR_ID/', {
-    //     method: 'POST',
-    //     body: JSON.stringify(userData)
-    // });
+    // Send to MongoDB backend
+    const API_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000/api/leads'
+        : '/api/leads'; // Uses same domain in production
     
-    // Option 2: Send to Make.com (Integromat)
-    // fetch('https://hook.integromat.com/YOUR_WEBHOOK_URL', {
-    //     method: 'POST',
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: JSON.stringify(userData)
-    // });
+    // Add calculator results to the user data
+    const resultsData = {
+        ...userData,
+        calculatorData: {
+            incidentCost: document.getElementById('incidentTotal')?.textContent || '0',
+            annualCost: document.getElementById('annualTotal')?.textContent || '0',
+            revenuePercentage: document.getElementById('revenuePercentage')?.textContent || '0'
+        }
+    };
     
-    // Option 3: Send to ConvertKit
-    // fetch('https://api.convertkit.com/v3/forms/YOUR_FORM_ID/subscribe', {
-    //     method: 'POST',
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: JSON.stringify({
-    //         api_key: 'YOUR_API_KEY',
-    //         email: userData.email,
-    //         fields: {
-    //             company_size: userData.companySize,
-    //             pain_point: userData.painPoint
-    //         }
-    //     })
-    // });
-    
-    // For now, just log to console (remove in production)
-    console.log('User data collected:', userData);
+    fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resultsData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Lead saved successfully');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving lead:', error);
+        // Still allow calculation to proceed even if save fails
+    });
 }
 
 // Show email gate modal
