@@ -242,13 +242,14 @@ function shareResults() {
     const shareText = `Bad Mobilization Calculator Results:\n` +
         `Cost per incident: ${incidentTotal}\n` +
         `Annual impact: ${annualTotal} (${percentage} of revenue)\n` +
-        `Calculate your costs: ${window.location.href}`;
+        `Calculate your costs: https://hc-build.com/tools/bad-mob-calc\n` +
+        `Built by @HarlanCharles`;
     
     if (navigator.share) {
         navigator.share({
             title: 'Bad Mobilization Cost Analysis',
             text: shareText,
-            url: window.location.href
+            url: 'https://hc-build.com/tools/bad-mob-calc'
         });
     } else {
         // Fallback: copy to clipboard

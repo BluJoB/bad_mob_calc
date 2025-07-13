@@ -34,7 +34,7 @@ The Bad Mobilization Calculator reveals the complete financial impact of mobiliz
 ## 🚀 Quick Start Guide
 
 ### Option 1: Use Online (Recommended)
-Visit the live calculator at: [https://bad-mob-calc.onrender.com](https://bad-mob-calc.onrender.com)
+Visit the live calculator at: [https://hc-build.com/tools/bad-mob-calc](https://hc-build.com/tools/bad-mob-calc)
 
 ### Option 2: Run Locally
 1. Clone the repository:
