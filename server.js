@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -215,6 +216,164 @@ app.post('/api/submitDemo', async (req, res) => {
     }
 });
 
+// Submit secure demo form with agreement tracking
+app.post('/api/submitDemoSecure', async (req, res) => {
+    try {
+        // Validate required fields
+        const { firstName, lastName, email, products, agreementDetails } = req.body;
+        
+        if (!firstName || !lastName || !email || !products || products.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required fields'
+            });
+        }
+
+        if (!agreementDetails || !agreementDetails.timestamp) {
+            return res.status(400).json({
+                success: false,
+                error: 'Agreement details are required'
+            });
+        }
+
+        // Generate secure access tokens for each product
+        const accessTokens = {};
+        const tokenExpiry = new Date();
+        tokenExpiry.setHours(tokenExpiry.getHours() + 24); // 24 hour expiry
+
+        products.forEach(product => {
+            const token = crypto.randomBytes(32).toString('hex');
+            accessTokens[product] = token;
+        });
+
+        // Save to demo_users collection with agreement details
+        const demoUser = new DemoUser({
+            firstName: req.body.firstName.trim(),
+            lastName: req.body.lastName.trim(),
+            email: req.body.email.trim().toLowerCase(),
+            company: req.body.company || null,
+            phone: req.body.phone || null,
+            products: req.body.products || [],
+            termsAccepted: true,
+            contactConsent: req.body.contactConsent,
+            agreementDetails: {
+                ...req.body.agreementDetails,
+                ipAddress: req.ip,
+                userAgent: req.get('user-agent'),
+                acceptedAt: new Date()
+            },
+            accessTokens: Object.keys(accessTokens).map(product => ({
+                product,
+                token: accessTokens[product],
+                expiresAt: tokenExpiry,
+                used: false,
+                createdAt: new Date()
+            })),
+            source: req.body.source || 'demo_form_secure',
+            timestamp: new Date()
+        });
+
+        await demoUser.save();
+
+        console.log(`✅ Secure demo user registered: ${email} with agreement at ${agreementDetails.timestamp}`);
+
+        res.status(201).json({
+            success: true,
+            message: 'Demo request submitted successfully with agreement recorded',
+            userId: demoUser._id,
+            accessTokens: accessTokens // Return tokens for immediate use
+        });
+
+    } catch (error) {
+        console.error('Error in /api/submitDemoSecure:', error);
+        
+        if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+            return res.status(409).json({
+                success: false,
+                error: 'This email already has demo access. Please contact support if you need assistance.'
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            error: 'Failed to submit demo request. Please try again.',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// Validate and consume access token
+app.get('/demo/access', async (req, res) => {
+    try {
+        const { token, product } = req.query;
+        
+        if (!token || !product) {
+            return res.status(400).send('Invalid access link');
+        }
+
+        // Find user with this token
+        const user = await DemoUser.findOne({
+            'accessTokens.token': token,
+            'accessTokens.product': product
+        });
+
+        if (!user) {
+            return res.status(404).send('Invalid or expired access link');
+        }
+
+        // Find the specific token
+        const tokenData = user.accessTokens.find(t => t.token === token && t.product === product);
+        
+        if (!tokenData) {
+            return res.status(404).send('Access token not found');
+        }
+
+        // Check if already used
+        if (tokenData.used) {
+            return res.status(403).send('This access link has already been used');
+        }
+
+        // Check if expired
+        if (new Date() > new Date(tokenData.expiresAt)) {
+            return res.status(403).send('This access link has expired');
+        }
+
+        // Mark token as used
+        await DemoUser.updateOne(
+            { 
+                _id: user._id,
+                'accessTokens.token': token 
+            },
+            { 
+                $set: { 
+                    'accessTokens.$.used': true,
+                    'accessTokens.$.usedAt': new Date()
+                }
+            }
+        );
+
+        // Redirect to actual demo based on product
+        let redirectUrl;
+        if (product === 'TIA Works') {
+            redirectUrl = 'https://bad-mob-calc.onrender.com';
+        } else if (product === 'TIA 1.OH') {
+            redirectUrl = 'https://image-text-1.onrender.com';
+        } else {
+            return res.status(400).send('Unknown product');
+        }
+
+        // Log access
+        console.log(`✅ Demo access granted for ${user.email} to ${product}`);
+
+        // Redirect to demo
+        res.redirect(redirectUrl);
+
+    } catch (error) {
+        console.error('Error validating access token:', error);
+        res.status(500).send('Error processing access request');
+    }
+});
+
 // Get demo users with pagination
 app.get('/api/demo-users/paginated', async (req, res) => {
     try {
@@ -268,16 +427,20 @@ const server = app.listen(PORT, () => {
     console.log(`\n📊 Admin Panels:`);
     console.log(`   - Calculator Leads: http://localhost:${PORT}/admin.html`);
     console.log(`   - Demo Users: http://localhost:${PORT}/demo-admin.html`);
+    console.log(`   - Demo Users Enhanced: http://localhost:${PORT}/demo-admin-enhanced.html`);
     console.log(`\n📝 Forms:`);
-    console.log(`   - Demo Access Form: http://localhost:${PORT}/demo-form.html`);
+    console.log(`   - Demo Form (Simple): http://localhost:${PORT}/demo-form.html`);
+    console.log(`   - Demo Form (Hover): http://localhost:${PORT}/demo-form-hover.html`);
+    console.log(`   - Demo Form (Secure): http://localhost:${PORT}/demo-form-secure.html`);
     console.log(`   - Calculator: http://localhost:${PORT}/`);
     console.log(`\n🔍 API Endpoints:`);
-    console.log(`   - POST /api/leads          (Calculator leads)`);
-    console.log(`   - GET  /api/leads          (View calculator leads)`);
-    console.log(`   - POST /api/submitDemo     (Demo form submissions)`);
-    console.log(`   - GET  /api/getDemoUsers   (View demo users)`);
-    console.log(`   - GET  /api/demo-users     (Alternative route)`);
-    console.log(`   - GET  /api/health         (Health check)`);
+    console.log(`   - POST /api/leads             (Calculator leads)`);
+    console.log(`   - GET  /api/leads             (View calculator leads)`);
+    console.log(`   - POST /api/submitDemo        (Demo form submissions)`);
+    console.log(`   - POST /api/submitDemoSecure  (Secure demo with agreements)`);
+    console.log(`   - GET  /api/getDemoUsers      (View demo users)`);
+    console.log(`   - GET  /demo/access           (Token validation & redirect)`);
+    console.log(`   - GET  /api/health            (Health check)`);
 });
 
 // Export for testing
