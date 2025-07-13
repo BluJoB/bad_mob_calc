@@ -436,8 +436,8 @@
             }
         });
 
-        // Form submission - NO BACKEND REQUIRED
-        form.addEventListener('submit', function(e) {
+        // Form submission - CONNECTS TO YOUR RENDER BACKEND
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             if (!validateForm()) {
@@ -449,7 +449,7 @@
             if (tiaWorks.checked) selectedProducts.push('TIA Works');
             if (tia1oh.checked) selectedProducts.push('TIA 1.OH');
 
-            // Store form data in localStorage (optional)
+            // Prepare form data
             const formData = {
                 firstName: firstName.value.trim(),
                 lastName: lastName.value.trim(),
@@ -459,22 +459,61 @@
                 products: selectedProducts,
                 termsAccepted: true,
                 contactConsent: contactConsent.checked,
+                agreementDetails: {
+                    timestamp: new Date().toISOString(),
+                    tosVersion: '1.0',
+                    tosAcceptedText: 'I have read and accept the Terms of Service and Licensing Agreement'
+                },
+                source: 'demo_form_standalone',
                 timestamp: new Date().toISOString()
             };
-            
-            // Save to localStorage for record keeping
-            const storedLeads = JSON.parse(localStorage.getItem('demoRequests') || '[]');
-            storedLeads.push(formData);
-            localStorage.setItem('demoRequests', JSON.stringify(storedLeads));
 
-            // Hide form and show success
-            form.style.display = 'none';
-            successMessage.style.display = 'block';
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
 
-            // Show demo links immediately
-            setTimeout(() => {
-                displayDemoLinks(selectedProducts);
-            }, 500);
+            try {
+                // Send to your Render backend - UPDATE THIS URL
+                const response = await fetch('https://bad-mob-calc.onrender.com/api/submitDemoSecure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Hide form and show success
+                    form.style.display = 'none';
+                    successMessage.style.display = 'block';
+
+                    // Show demo links immediately
+                    setTimeout(() => {
+                        displayDemoLinks(selectedProducts);
+                    }, 500);
+                } else {
+                    throw new Error(result.error || 'Submission failed');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                // If backend fails, still show the demos (graceful degradation)
+                alert('Note: There was an issue saving your information, but you can still access the demos.');
+                
+                // Hide form and show success
+                form.style.display = 'none';
+                successMessage.style.display = 'block';
+
+                // Show demo links anyway
+                setTimeout(() => {
+                    displayDemoLinks(selectedProducts);
+                }, 500);
+            }
+
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Demo Request';
         });
 
         // Display demo links
