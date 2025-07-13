@@ -1,0 +1,13 @@
+{
+  "name": "bad-mobilization-calculator",
+  "version": "1.0.0",
+  "description": "Open source calculator to quantify construction mobilization failure costs",
+  "main": "index.html",
+  "keywords": ["construction", "mobilization", "cost-calculator", "project-management"],
+  "author": "Harlan Charles & TIA Works Community",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/[username]/bad_mob_calc.git"
+  }
+}
