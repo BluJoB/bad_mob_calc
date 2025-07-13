@@ -525,13 +525,15 @@
                     title: 'Bad Mobilization Calculator',
                     description: 'Calculate the true cost of mobilization failures in construction',
                     url: 'https://bad-mob-calc.onrender.com/index.html',
-                    color: '#4A90E2'
+                    color: '#4A90E2',
+                    available: true
                 },
                 'TIA 1.OH': {
                     title: 'Image Text Analysis',
                     description: 'Extract and analyze text from construction documents and images',
                     url: 'https://image-text-1.onrender.com',
-                    color: '#10b981'
+                    color: '#10b981',
+                    available: false
                 }
             };
 
@@ -540,13 +542,25 @@
                 if (demo) {
                     const card = document.createElement('div');
                     card.className = 'demo-link-card';
-                    card.innerHTML = `
-                        <h4>${product}</h4>
-                        <p>${demo.description}</p>
-                        <a href="${demo.url}" target="_blank" class="btn-demo" style="background-color: ${demo.color}">
-                            Launch ${demo.title}
-                        </a>
-                    `;
+                    
+                    if (demo.available) {
+                        card.innerHTML = `
+                            <h4>${product}</h4>
+                            <p>${demo.description}</p>
+                            <a href="${demo.url}" target="_blank" class="btn-demo" style="background-color: ${demo.color}">
+                                Launch ${demo.title}
+                            </a>
+                        `;
+                    } else {
+                        card.innerHTML = `
+                            <h4>${product}</h4>
+                            <p>${demo.description}</p>
+                            <div class="btn-demo" style="background-color: #6c757d; cursor: not-allowed;">
+                                Coming Soon
+                            </div>
+                        `;
+                    }
+                    
                     demoLinksGrid.appendChild(card);
                 }
             });

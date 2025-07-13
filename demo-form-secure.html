@@ -636,12 +636,21 @@
                 if (token) {
                     const linkItem = document.createElement('div');
                     linkItem.className = 'access-link-item';
-                    linkItem.innerHTML = `
-                        <span class="product-name">${product}</span>
-                        <button class="btn-access" onclick="openSecureDemo('${product}', '${token}')">
-                            Launch Demo
-                        </button>
-                    `;
+                    if (product === 'TIA 1.OH') {
+                        linkItem.innerHTML = `
+                            <span class="product-name">${product}</span>
+                            <button class="btn-access" style="background-color: #6c757d; cursor: not-allowed;" disabled>
+                                Coming Soon
+                            </button>
+                        `;
+                    } else {
+                        linkItem.innerHTML = `
+                            <span class="product-name">${product}</span>
+                            <button class="btn-access" onclick="openSecureDemo('${product}', '${token}')">
+                                Launch Demo
+                            </button>
+                        `;
+                    }
                     linkContainer.appendChild(linkItem);
                 }
             });
@@ -651,13 +660,17 @@
 
         // Open demo in new tab with secure token
         window.openSecureDemo = function(product, token) {
+            // Check if product is available
+            if (product === 'TIA 1.OH') {
+                alert('TIA 1.OH - Image Text Analysis is coming soon!');
+                return;
+            }
+            
             // For now, directly open the demo URLs without token validation
             // Update these URLs to your actual demo applications
             let demoUrl;
             if (product === 'TIA Works') {
                 demoUrl = 'https://bad-mob-calc.onrender.com';
-            } else if (product === 'TIA 1.OH') {
-                demoUrl = 'https://image-text-1.onrender.com';
             }
             
             // Open demo in new tab
