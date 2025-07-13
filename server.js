@@ -24,13 +24,17 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bad_mo
 
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
 }).then(() => {
     console.log('✅ Connected to MongoDB successfully');
-    console.log(`Database: bad_mob_calc`);
+    console.log(`Database: ${mongoose.connection.name}`);
+    console.log(`Host: ${mongoose.connection.host}`);
     console.log(`URI: ${MONGODB_URI.replace(/\/\/.*:.*@/, '//***:***@')}`); // Hide credentials in logs
 }).catch(err => {
     console.error('❌ MongoDB connection error:', err.message);
+    console.error('Full error:', err);
+    console.error('Connection string format: ', MONGODB_URI ? 'mongodb+srv://...' : 'NOT SET');
     console.error('Please check your MONGODB_URI environment variable');
     // Don't exit - allow server to run for static files
 });
