@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Access Form — HC Build</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #222222;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: #fafafa;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #4A90E2;
+            background-color: #ffffff;
+        }
+
+        .required {
+            color: #e74c3c;
+            font-weight: normal;
+        }
+
+        .checkbox-group {
+            margin-bottom: 25px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 3px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .products-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .products-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #444444;
+        }
+
+        /* Terms of Service Styles */
+        .tos-section {
+            margin: 30px 0;
+        }
+
+        .tos-content {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .tos-content h3 {
+            margin-bottom: 15px;
+            color: #222;
+            font-size: 18px;
+        }
+
+        .tos-content ul {
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .tos-content li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .agreement-section {
+            background-color: #f0f4f8;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #d1d9e0;
+            margin-bottom: 20px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px 20px;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background-color: #357ABD;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-submit:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .success-message h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        /* Direct Demo Links */
+        .demo-links-section {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .demo-links-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 22px;
+        }
+
+        .demo-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .demo-link-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .demo-link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .demo-link-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .demo-link-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .btn-demo {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4A90E2;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-demo:hover {
+            background-color: #357ABD;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666666;
+            margin-top: 10px;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+                padding-bottom: 50px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin-bottom: 50px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+
+            .demo-links-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tos-content {
+                max-height: 200px;
+            }
+            
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"] {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Demo Access Form — HC Build</h1>
+        <p class="subtitle">Please complete this form to access our product demos</p>
+
+        <form id="demoForm">
+            <div class="form-group">
+                <label for="firstName">First Name <span class="required">*</span></label>
+                <input type="text" id="firstName" name="firstName" required>
+                <span class="error" id="firstNameError">Please enter your first name</span>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name <span class="required">*</span></label>
+                <input type="text" id="lastName" name="lastName" required>
+                <span class="error" id="lastNameError">Please enter your last name</span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+                <span class="error" id="emailError">Please enter a valid email address</span>
+            </div>
+
+            <div class="form-group">
+                <label for="company">Company Name</label>
+                <input type="text" id="company" name="company">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567">
+            </div>
+
+            <div class="products-section">
+                <div class="products-title">Product(s) of Interest: <span class="required">*</span></div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="tiaWorks" name="products" value="TIA Works">
+                        TIA Works - Bad Mobilization Calculator
+                    </label>
+                    <label>
+                        <input type="checkbox" id="tia1oh" name="products" value="TIA 1.OH">
+                        TIA 1.OH - Image Text Analysis Platform
+                    </label>
+                </div>
+            </div>
+
+            <!-- Terms of Service Section -->
+            <div class="tos-section">
+                <h3>Terms of Service & Licensing Agreement</h3>
+                <div class="tos-content">
+                    <h3>HC Build Terms of Service & Licensing Agreement</h3>
+                    <p>
+                        By accessing or using TIA 1.OH or TIA Works, you agree to the following:
+                    </p>
+                    <ul>
+                        <li>You are granted a non-transferable, limited license to use the selected tool for evaluation purposes only.</li>
+                        <li>All content, data, and software outputs remain the sole intellectual property of HC Build.</li>
+                        <li>You agree not to copy, distribute, reverse engineer, or reproduce any part of the software without written consent.</li>
+                        <li>HC Build assumes no liability for project outcomes, injuries, losses, or damages resulting from tool usage.</li>
+                        <li>You consent to HC Build storing and processing your demo request data for internal use and product improvement.</li>
+                    </ul>
+                    <p>
+                        Violating these terms may result in immediate revocation of access and potential legal action.
+                    </p>
+                </div>
+                
+                <div class="agreement-section">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="termsAcceptance" name="termsAcceptance" required>
+                            I have read and accept the Terms of Service and Licensing Agreement <span class="required">*</span>
+                        </label>
+                        <label>
+                            <input type="checkbox" id="contactConsent" name="contactConsent" required>
+                            I consent to be contacted by HC Build regarding product information and updates <span class="required">*</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                Submit Demo Request
+            </button>
+
+            <div class="loading" id="loadingMessage">
+                Processing your request...
+            </div>
+        </form>
+
+        <div class="success-message" id="successMessage">
+            <h2>Success!</h2>
+            <p>Thank you for your interest in our products. Your demo access has been approved!</p>
+        </div>
+
+        <!-- Direct Demo Links Section -->
+        <div class="demo-links-section" id="demoLinksSection">
+            <h3>Access Your Selected Demos</h3>
+            <div class="demo-links-grid" id="demoLinksGrid">
+                <!-- Links will be dynamically added here based on selection -->
+            </div>
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                Each link will open in a new tab. Make sure pop-ups are enabled for this site.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Form elements
+        const form = document.getElementById('demoForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const demoLinksSection = document.getElementById('demoLinksSection');
+        const demoLinksGrid = document.getElementById('demoLinksGrid');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        // Form fields
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
+        const email = document.getElementById('email');
+        const company = document.getElementById('company');
+        const phone = document.getElementById('phone');
+        const termsAcceptance = document.getElementById('termsAcceptance');
+        const contactConsent = document.getElementById('contactConsent');
+
+        // Product checkboxes
+        const tiaWorks = document.getElementById('tiaWorks');
+        const tia1oh = document.getElementById('tia1oh');
+
+        // Validation function
+        function validateForm() {
+            const isValid = 
+                firstName.value.trim() !== '' &&
+                lastName.value.trim() !== '' &&
+                email.value.trim() !== '' &&
+                email.validity.valid &&
+                termsAcceptance.checked &&
+                contactConsent.checked &&
+                (tiaWorks.checked || tia1oh.checked); // At least one product selected
+
+            submitBtn.disabled = !isValid;
+            return isValid;
+        }
+
+        // Add event listeners for real-time validation
+        [firstName, lastName, email, termsAcceptance, contactConsent, tiaWorks, tia1oh].forEach(field => {
+            field.addEventListener('input', validateForm);
+            field.addEventListener('change', validateForm);
+        });
+
+        // Email validation
+        email.addEventListener('blur', function() {
+            const emailError = document.getElementById('emailError');
+            if (!email.validity.valid && email.value.trim() !== '') {
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            // Collect selected products
+            const selectedProducts = [];
+            if (tiaWorks.checked) selectedProducts.push('TIA Works');
+            if (tia1oh.checked) selectedProducts.push('TIA 1.OH');
+
+            // Prepare data
+            const formData = {
+                firstName: firstName.value.trim(),
+                lastName: lastName.value.trim(),
+                email: email.value.trim(),
+                company: company.value.trim() || null,
+                phone: phone.value.trim() || null,
+                products: selectedProducts,
+                termsAccepted: true,
+                contactConsent: contactConsent.checked,
+                agreementDetails: {
+                    timestamp: new Date().toISOString(),
+                    tosVersion: '1.0',
+                    tosAcceptedText: 'I have read and accept the Terms of Service and Licensing Agreement'
+                },
+                source: 'demo_form_direct',
+                timestamp: new Date().toISOString()
+            };
+
+            // Show loading
+            submitBtn.style.display = 'none';
+            loadingMessage.style.display = 'block';
+
+            try {
+                // Send to API - Update this URL to your backend
+                const response = await fetch('/api/submitDemoSecure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Hide form and show success
+                    form.style.display = 'none';
+                    successMessage.style.display = 'block';
+
+                    // Show demo links
+                    setTimeout(() => {
+                        displayDemoLinks(selectedProducts);
+                    }, 1000);
+                } else {
+                    throw new Error(result.error || 'Submission failed');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('There was an error submitting your request. Please try again or contact support.');
+                submitBtn.style.display = 'block';
+                loadingMessage.style.display = 'none';
+            }
+        });
+
+        // Display demo links
+        function displayDemoLinks(products) {
+            demoLinksGrid.innerHTML = '';
+            
+            const demos = {
+                'TIA Works': {
+                    title: 'Bad Mobilization Calculator',
+                    description: 'Calculate the true cost of mobilization failures in construction',
+                    url: 'https://bad-mob-calc.onrender.com/index.html',
+                    color: '#4A90E2',
+                    available: true
+                },
+                'TIA 1.OH': {
+                    title: 'Image Text Analysis',
+                    description: 'Extract and analyze text from construction documents and images',
+                    url: null,
+                    color: '#10b981',
+                    available: false
+                }
+            };
+
+            products.forEach(product => {
+                const demo = demos[product];
+                if (demo) {
+                    const card = document.createElement('div');
+                    card.className = 'demo-link-card';
+                    
+                    if (demo.available) {
+                        card.innerHTML = `
+                            <h4>${product}</h4>
+                            <p>${demo.description}</p>
+                            <button class="btn-demo" style="background-color: ${demo.color}" onclick="launchProtectedDemo('${product}')">
+                                Launch ${demo.title}
+                            </button>
+                        `;
+                    } else {
+                        card.innerHTML = `
+                            <h4>${product}</h4>
+                            <p>${demo.description}</p>
+                            <button class="btn-demo" style="background-color: #6c757d; cursor: not-allowed;" disabled>
+                                Coming Soon
+                            </button>
+                        `;
+                    }
+                    
+                    demoLinksGrid.appendChild(card);
+                }
+            });
+            
+            demoLinksSection.style.display = 'block';
+        }
+
+        // Secure demo launch function
+        window.launchProtectedDemo = function(product) {
+            const encodedUrls = {
+                'TIA Works': 'aHR0cHM6Ly9iYWQtbW9iLWNhbGMub25yZW5kZXIuY29tL2luZGV4Lmh0bWw='
+            };
+            
+            if (encodedUrls[product]) {
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.location = atob(encodedUrls[product]);
+                } else {
+                    alert('Please allow pop-ups to access the demo.');
+                }
+            }
+        };
+
+        // Phone number formatting
+        phone.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 6) {
+                value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+            } else if (value.length >= 3) {
+                value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+            }
+            e.target.value = value;
+        });
+        
+        // Security measures
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'a')) {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

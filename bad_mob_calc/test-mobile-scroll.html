@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Scroll Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #f0f0f0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .form-field {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Mobile Scrolling Test</h2>
+        <p>Test the form on mobile to ensure the submit button is accessible when the keyboard appears.</p>
+        
+        <div class="form-field">
+            <label>Name:</label>
+            <input type="text" placeholder="Enter your name">
+        </div>
+        
+        <div class="form-field">
+            <label>Email:</label>
+            <input type="email" placeholder="Enter your email">
+        </div>
+        
+        <div class="form-field">
+            <label>Phone:</label>
+            <input type="tel" placeholder="Enter your phone">
+        </div>
+        
+        <div class="form-field">
+            <label>Message:</label>
+            <input type="text" placeholder="Enter a message">
+        </div>
+        
+        <button type="button" onclick="showStatus()">Submit Test</button>
+        
+        <div class="status" id="status" style="display: none;">
+            Success! The button is accessible.
+        </div>
+    </div>
+    
+    <script>
+        function showStatus() {
+            document.getElementById('status').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

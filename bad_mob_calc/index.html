@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Mobilization Calculator - Quantify Your True Costs | HC Build</title>
+    <meta name="description" content="Calculate the hidden costs of mobilization failures in construction. Research-backed tool reveals 5-20x cascade costs. Built by Harlan Charles.">
+    
+    <!-- Open Graph / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hc-build.com/tools/bad-mob-calc">
+    <meta property="og:title" content="Bad Mobilization Calculator - Stop Losing Money on Failed Mobilizations">
+    <meta property="og:description" content="78% of construction workers idle weekly. Calculate your true costs with this free tool. Save up to $500K annually.">
+    <meta property="og:image" content="https://hc-build.com/tools/bad-mob-calc/preview.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hc-build.com/tools/bad-mob-calc">
+    <meta property="twitter:title" content="Bad Mobilization Calculator">
+    <meta property="twitter:description" content="Calculate the hidden costs of construction mobilization failures">
+    
+    <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Bad Mobilization Calculator</h1>
+            <p class="tagline">Quantify the true cost of mobilization failures in construction</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="intro">
+                <div class="stats-banner">
+                    <div class="stat">
+                        <strong>78%</strong>
+                        <span>of workers experience idle time weekly</span>
+                    </div>
+                    <div class="stat">
+                        <strong>5.5 hrs</strong>
+                        <span>weekly searching for project data</span>
+                    </div>
+                    <div class="stat">
+                        <strong>5-22%</strong>
+                        <span>industry mobilization failure rate</span>
+                    </div>
+                </div>
+            </section>
+
+            <form id="calculatorForm" class="calculator-form">
+                <section class="form-section">
+                    <h2>Basic Project Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="crewSize">Crew Size</label>
+                            <input type="number" id="crewSize" name="crewSize" min="1" max="50" value="5" required>
+                            <small>Number of workers mobilized</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="hourlyRate">Average Hourly Rate ($)</label>
+                            <input type="number" id="hourlyRate" name="hourlyRate" min="15" max="150" step="0.50" value="45" required>
+                            <small>Base hourly wage per worker</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobilizationDistance">Mobilization Distance (miles)</label>
+                            <input type="number" id="mobilizationDistance" name="mobilizationDistance" min="0" max="500" value="25" required>
+                            <small>One-way distance to job site</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectComplexity">Project Complexity</label>
+                            <select id="projectComplexity" name="projectComplexity" required>
+                                <option value="1.0">Simple (1.0x)</option>
+                                <option value="1.5" selected>Moderate (1.5x)</option>
+                                <option value="2.0">Complex (2.0x)</option>
+                                <option value="2.5">Highly Complex (2.5x)</option>
+                            </select>
+                            <small>Coordination difficulty multiplier</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2>Mobilization Failure Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="idleHours">Hours Lost to Bad Mobilization</label>
+                            <input type="number" id="idleHours" name="idleHours" min="0.5" max="16" step="0.5" value="4" required>
+                            <small>Time crew was idle or unproductive</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="equipmentDailyRate">Equipment Daily Rate ($)</label>
+                            <input type="number" id="equipmentDailyRate" name="equipmentDailyRate" min="0" max="5000" value="500" required>
+                            <small>Daily cost of idle equipment</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="numberOfVehicles">Number of Vehicles</label>
+                            <input type="number" id="numberOfVehicles" name="numberOfVehicles" min="1" max="20" value="3" required>
+                            <small>Vehicles used for mobilization</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="remobilizationRequired">Remobilization Required?</label>
+                            <select id="remobilizationRequired" name="remobilizationRequired" required>
+                                <option value="0">No</option>
+                                <option value="1" selected>Yes</option>
+                            </select>
+                            <small>Will crew need to return?</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2>Business Impact Factors</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="annualRevenue">Annual Company Revenue ($)</label>
+                            <input type="number" id="annualRevenue" name="annualRevenue" min="100000" max="50000000" value="5000000" required>
+                            <small>For calculating overhead impact</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerLifetimeValue">Customer Lifetime Value ($)</label>
+                            <input type="number" id="customerLifetimeValue" name="customerLifetimeValue" min="10000" max="5000000" value="250000" required>
+                            <small>Average customer project value over time</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentsPerMonth">Bad Mobilizations per Month</label>
+                            <input type="number" id="incidentsPerMonth" name="incidentsPerMonth" min="0" max="50" step="0.5" value="8" required>
+                            <small>Frequency of mobilization failures</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="overheadRate">Overhead Rate (%)</label>
+                            <input type="number" id="overheadRate" name="overheadRate" min="10" max="50" value="25" required>
+                            <small>Company overhead percentage</small>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Calculate True Costs</button>
+                    <button type="reset" class="btn-secondary">Reset Form</button>
+                </div>
+            </form>
+
+            <section id="results" class="results-section" style="display: none;">
+                <h2>Mobilization Failure Cost Analysis</h2>
+                
+                <div class="cost-layers">
+                    <div class="cost-layer layer-1">
+                        <h3>Layer 1: Direct Costs</h3>
+                        <div class="cost-breakdown">
+                            <div class="cost-item">
+                                <span>Labor Costs:</span>
+                                <strong id="laborCost">$0</strong>
+                            </div>
+                            <div class="cost-item">
+                                <span>Transportation Costs:</span>
+                                <strong id="transportationCost">$0</strong>
+                            </div>
+                            <div class="cost-item">
+                                <span>Equipment Idle Costs:</span>
+                                <strong id="equipmentCost">$0</strong>
+                            </div>
+                            <div class="cost-total">
+                                <span>Layer 1 Total:</span>
+                                <strong id="layer1Total">$0</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cost-layer layer-2">
+                        <h3>Layer 2: Cascade Costs</h3>
+                        <div class="cost-breakdown">
+                            <div class="cost-item">
+                                <span>Trade Coordination Delays:</span>
+                                <strong id="tradeCost">$0</strong>
+                            </div>
+                            <div class="cost-item">
+                                <span>Schedule Compression Costs:</span>
+                                <strong id="scheduleCost">$0</strong>
+                            </div>
+                            <div class="cost-item">
+                                <span>Fixed Cost Loss:</span>
+                                <strong id="fixedCostLoss">$0</strong>
+                            </div>
+                            <div class="cost-total">
+                                <span>Layer 2 Total:</span>
+                                <strong id="layer2Total">$0</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cost-layer layer-3">
+                        <h3>Layer 3: Strategic Costs</h3>
+                        <div class="cost-breakdown">
+                            <div class="cost-item">
+                                <span>Remobilization Costs:</span>
+                                <strong id="remobilizationCost">$0</strong>
+                            </div>
+                            <div class="cost-item">
+                                <span>Customer Relationship Impact:</span>
+                                <strong id="customerImpact">$0</strong>
+                            </div>
+                            <div class="cost-item">
+                                <span>Future Revenue at Risk:</span>
+                                <strong id="revenueRisk">$0</strong>
+                            </div>
+                            <div class="cost-total">
+                                <span>Layer 3 Total:</span>
+                                <strong id="layer3Total">$0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="total-impact">
+                    <div class="impact-summary">
+                        <h3>Total Cost Per Incident</h3>
+                        <div class="big-number" id="incidentTotal">$0</div>
+                    </div>
+                    <div class="impact-summary">
+                        <h3>Annual Cost Impact</h3>
+                        <div class="big-number" id="annualTotal">$0</div>
+                    </div>
+                    <div class="impact-summary">
+                        <h3>% of Annual Revenue</h3>
+                        <div class="big-number" id="revenuePercentage">0%</div>
+                    </div>
+                </div>
+
+                <div class="roi-section">
+                    <h3>Investment Analysis</h3>
+                    <p>Implementing proper mobilization controls could save your company up to <strong id="potentialSavings">$0</strong> annually.</p>
+                    <p class="roi-note">This represents a <strong id="roiMultiple">0x</strong> ROI on typical project management system investments.</p>
+                    <div class="cta-box">
+                        <h4>Ready to eliminate these costs?</h4>
+                        <p>TIA Works provides intelligent project controls that prevent mobilization failures before they happen.</p>
+                        <a href="https://tiaworks.com?utm_source=calculator&utm_medium=web&utm_campaign=bad_mob_calc" target="_blank" class="btn-cta">Learn How TIA Works Can Help →</a>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button id="exportResults" class="btn-primary">Export Results</button>
+                    <button id="shareResults" class="btn-secondary">Share Analysis</button>
+                </div>
+            </section>
+
+            <section class="methodology">
+                <h2>Research-Based Methodology</h2>
+                <p>Our calculations are based on:</p>
+                <ul>
+                    <li><strong>Harvard Business School:</strong> 78% of construction workers experience weekly idle time</li>
+                    <li><strong>FMI Corporation:</strong> Construction PMs spend 5.5 hours weekly searching for project data</li>
+                    <li><strong>AAA Research:</strong> $0.67/mile fuel costs, $0.40/mile vehicle wear</li>
+                    <li><strong>Industry Standards:</strong> 35% burden rate, 25% overhead allocation</li>
+                </ul>
+                <p class="disclaimer">Note: These are conservative estimates. Real costs are often 2-5x higher when accounting for all hidden impacts.</p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <p>Built by Harlan Charles & TIA Works Community | <a href="https://github.com/BluJoB/bad_mob_calc" target="_blank">Open Source on GitHub</a></p>
+                    <p>MIT License - Free to use and modify</p>
+                </div>
+                <div class="footer-cta">
+                    <p><strong>Stop losing money on bad mobilizations</strong></p>
+                    <p>Discover how TIA Works transforms construction operations: <a href="https://tiaworks.com?utm_source=calculator&utm_medium=footer&utm_campaign=bad_mob_calc" target="_blank">Visit TIAWorks.com</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Email Gate Modal -->
+    <div id="emailGate" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Get Your Mobilization Cost Analysis</h2>
+            <p>Join 500+ construction professionals optimizing their operations</p>
+            
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="userEmail">Email Address</label>
+                    <input type="email" id="userEmail" name="email" required placeholder="your@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="companySize">Company Size</label>
+                    <select id="companySize" name="companySize" required>
+                        <option value="">Select...</option>
+                        <option value="1-10">1-10 employees</option>
+                        <option value="11-50">11-50 employees</option>
+                        <option value="51-100">51-100 employees</option>
+                        <option value="100+">100+ employees</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="painPoint">Biggest Mobilization Challenge</label>
+                    <select id="painPoint" name="painPoint" required>
+                        <option value="">Select...</option>
+                        <option value="communication">Poor communication/coordination</option>
+                        <option value="planning">Inadequate planning</option>
+                        <option value="resources">Resource availability</option>
+                        <option value="weather">Weather/external factors</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="newsletter" name="newsletter" checked>
+                        Send me construction efficiency tips (1-2 emails/month)
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-full">Calculate My Costs</button>
+                
+                <p class="privacy-note">We respect your privacy. Unsubscribe anytime.</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="src/js/calculator.js"></script>
+    <script src="src/js/email-gate.js"></script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Users Dashboard - HC Build</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #222222;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-card h3 {
+            color: #666666;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 600;
+            color: #4A90E2;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #357ABD;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 300px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555555;
+            border-bottom: 2px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .products {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .product-tag {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .consent-indicators {
+            display: flex;
+            gap: 10px;
+        }
+
+        .indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .indicator.yes {
+            background-color: #28a745;
+        }
+
+        .indicator.no {
+            background-color: #dc3545;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666666;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Demo Users Dashboard</h1>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Demo Users</h3>
+                <div class="value" id="totalUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>This Week</h3>
+                <div class="value" id="weekUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Today</h3>
+                <div class="value" id="todayUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>With Contact Consent</h3>
+                <div class="value" id="consentUsers">0</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div>
+                <input type="text" class="search-box" id="searchBox" placeholder="Search by name, email, or company...">
+            </div>
+            <div>
+                <button class="btn" onclick="refreshData()">Refresh</button>
+                <button class="btn btn-secondary" onclick="exportToCSV()">Export CSV</button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error" style="display: none;"></div>
+
+        <div id="loading" class="loading">
+            Loading demo users...
+        </div>
+
+        <div id="tableContainer" style="display: none; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Phone</th>
+                        <th>Products</th>
+                        <th>Terms</th>
+                        <th>Contact</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+        let filteredUsers = [];
+
+        async function loadDemoUsers() {
+            const loading = document.getElementById('loading');
+            const tableContainer = document.getElementById('tableContainer');
+            const errorMessage = document.getElementById('errorMessage');
+
+            loading.style.display = 'block';
+            tableContainer.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/getDemoUsers');
+                const result = await response.json();
+
+                if (result.success) {
+                    allUsers = result.data;
+                    filteredUsers = allUsers;
+                    updateStats();
+                    renderTable();
+                    loading.style.display = 'none';
+                    tableContainer.style.display = 'block';
+                } else {
+                    throw new Error(result.error || 'Failed to load demo users');
+                }
+            } catch (error) {
+                console.error('Error loading demo users:', error);
+                loading.style.display = 'none';
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function updateStats() {
+            // Total users
+            document.getElementById('totalUsers').textContent = allUsers.length;
+
+            // This week
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekUsers = allUsers.filter(user => 
+                new Date(user.timestamp) > weekAgo
+            );
+            document.getElementById('weekUsers').textContent = weekUsers.length;
+
+            // Today
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayUsers = allUsers.filter(user => 
+                new Date(user.timestamp) >= today
+            );
+            document.getElementById('todayUsers').textContent = todayUsers.length;
+
+            // With contact consent
+            const consentUsers = allUsers.filter(user => user.contactConsent);
+            document.getElementById('consentUsers').textContent = consentUsers.length;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            filteredUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(user.timestamp).toLocaleDateString()}</td>
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.company || '-'}</td>
+                    <td>${user.phone || '-'}</td>
+                    <td>
+                        <div class="products">
+                            ${(user.products || []).map(p => 
+                                `<span class="product-tag">${p}</span>`
+                            ).join('') || '-'}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="indicator ${user.termsAccepted ? 'yes' : 'no'}">
+                            ${user.termsAccepted ? '✓' : '✗'}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="indicator ${user.contactConsent ? 'yes' : 'no'}">
+                            ${user.contactConsent ? '✓' : '✗'}
+                        </div>
+                    </td>
+                    <td>${user.source || 'demo_form'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                filteredUsers = allUsers;
+            } else {
+                filteredUsers = allUsers.filter(user => {
+                    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+                    const email = user.email.toLowerCase();
+                    const company = (user.company || '').toLowerCase();
+                    
+                    return fullName.includes(searchTerm) ||
+                           email.includes(searchTerm) ||
+                           company.includes(searchTerm);
+                });
+            }
+            
+            renderTable();
+        });
+
+        function refreshData() {
+            loadDemoUsers();
+        }
+
+        function exportToCSV() {
+            const headers = ['Date', 'First Name', 'Last Name', 'Email', 'Company', 'Phone', 'Products', 'Terms Accepted', 'Contact Consent', 'Source'];
+            
+            const csvData = [
+                headers.join(','),
+                ...filteredUsers.map(user => [
+                    new Date(user.timestamp).toLocaleDateString(),
+                    user.firstName,
+                    user.lastName,
+                    user.email,
+                    user.company || '',
+                    user.phone || '',
+                    (user.products || []).join(';'),
+                    user.termsAccepted ? 'Yes' : 'No',
+                    user.contactConsent ? 'Yes' : 'No',
+                    user.source || 'demo_form'
+                ].map(field => `"${field}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `demo_users_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Load data on page load
+        loadDemoUsers();
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadDemoUsers, 30000);
+    </script>
+</body>
+</html>

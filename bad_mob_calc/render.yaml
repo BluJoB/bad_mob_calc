@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: bad-mob-calc
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+    healthCheckPath: /

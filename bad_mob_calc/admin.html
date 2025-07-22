@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Mob Calc - Lead Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin: 0;
+            color: #1e40af;
+        }
+        .stat-card p {
+            margin: 5px 0 0;
+            font-size: 2em;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .export-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .export-btn:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lead Dashboard</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Leads</h3>
+                <p id="totalLeads">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>This Week</h3>
+                <p id="weekLeads">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Newsletter Signups</h3>
+                <p id="newsletterSignups">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Annual Cost</h3>
+                <p id="avgCost">$0</p>
+            </div>
+        </div>
+        
+        <button class="export-btn" onclick="exportToCSV()">Export to CSV</button>
+        
+        <table id="leadsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Email</th>
+                    <th>Company Size</th>
+                    <th>Pain Point</th>
+                    <th>Annual Cost</th>
+                    <th>Newsletter</th>
+                </tr>
+            </thead>
+            <tbody id="leadsBody">
+                <!-- Leads will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch and display leads
+        async function loadLeads() {
+            try {
+                const response = await fetch('/api/leads');
+                const leads = await response.json();
+                
+                // Update stats
+                document.getElementById('totalLeads').textContent = leads.length;
+                
+                // Week leads
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                const weekLeads = leads.filter(lead => new Date(lead.timestamp) > weekAgo);
+                document.getElementById('weekLeads').textContent = weekLeads.length;
+                
+                // Newsletter signups
+                const newsletterCount = leads.filter(lead => lead.newsletter).length;
+                document.getElementById('newsletterSignups').textContent = newsletterCount;
+                
+                // Average cost
+                const validCosts = leads
+                    .filter(lead => lead.calculatorData?.annualCost)
+                    .map(lead => parseFloat(lead.calculatorData.annualCost.replace(/[$,]/g, '')));
+                const avgCost = validCosts.length > 0 
+                    ? validCosts.reduce((a, b) => a + b, 0) / validCosts.length 
+                    : 0;
+                document.getElementById('avgCost').textContent = '$' + Math.round(avgCost).toLocaleString();
+                
+                // Populate table
+                const tbody = document.getElementById('leadsBody');
+                tbody.innerHTML = leads.map(lead => `
+                    <tr>
+                        <td>${new Date(lead.timestamp).toLocaleDateString()}</td>
+                        <td>${lead.email}</td>
+                        <td>${lead.companySize}</td>
+                        <td>${lead.painPoint}</td>
+                        <td>${lead.calculatorData?.annualCost || 'N/A'}</td>
+                        <td>${lead.newsletter ? '✓' : ''}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading leads:', error);
+            }
+        }
+        
+        // Export to CSV
+        function exportToCSV() {
+            fetch('/api/leads')
+                .then(response => response.json())
+                .then(leads => {
+                    const csv = [
+                        ['Date', 'Email', 'Company Size', 'Pain Point', 'Annual Cost', 'Newsletter'],
+                        ...leads.map(lead => [
+                            new Date(lead.timestamp).toLocaleDateString(),
+                            lead.email,
+                            lead.companySize,
+                            lead.painPoint,
+                            lead.calculatorData?.annualCost || 'N/A',
+                            lead.newsletter ? 'Yes' : 'No'
+                        ])
+                    ].map(row => row.join(',')).join('\n');
+                    
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `leads_${Date.now()}.csv`;
+                    a.click();
+                });
+        }
+        
+        // Load leads on page load
+        loadLeads();
+        // Refresh every 30 seconds
+        setInterval(loadLeads, 30000);
+    </script>
+</body>
+</html>
